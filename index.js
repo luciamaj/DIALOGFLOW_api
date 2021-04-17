@@ -4,7 +4,7 @@ const dialogflow = require('dialogflow');
 const { struct } = require('pb-util');  
 const bodyParser = require('body-parser');
 
-const projectId = 'provaapi-jrgakd';
+const projectId = 'newagent-869ef';
 const contextsClient = new dialogflow.ContextsClient({keyFilename: "new.json"});
 const sessionClient = new dialogflow.SessionsClient({keyFilename: "new.json"});
 const uuid = require('uuid');
@@ -57,7 +57,7 @@ io.on('connection', (socket) => {
     });
 });
 
-function sendQuery(sessionId, query, contexta) {
+function sendQuery(sessionId, query, contexts) {
     const session = sessionClient.sessionPath(projectId, sessionId);
 
     const request = {
@@ -65,11 +65,8 @@ function sendQuery(sessionId, query, contexta) {
         queryInput: {
             text: {
                 text: query,
-                languageCode: 'en-US',
+                languageCode: 'it-IT',
             },
-        },
-        queryParams: {
-            contexts: [context] 
         }
     };
 
@@ -79,18 +76,19 @@ function sendQuery(sessionId, query, contexta) {
 async function sendMsg(msg) {
     const sessionId = uuid.v4();
     const responses = await sendQuery(sessionId, msg, {});
+    console.log("SONO ANCORA QUI", responses);
 
-    console.log('Detected intent', responses[0].queryResult.outputContexts);
+    // console.log('Detected intent', responses[0].queryResult.outputContexts);
     const result = responses[0].queryResult;
-    console.log(`  Query: ${result.queryText}`);
-    console.log(`  Response: ${result.fulfillmentText}`);
+    // console.log(`  Query: ${result.queryText}`);
+    // console.log(`  Response: ${result.fulfillmentText}`);
     client.emit('BOT_RESPONSE', result.fulfillmentText);
 
-    if (result.intent) {
-        console.log(`  Intent: ${result.intent.displayName}`);
-    } else {
-        console.log(`  No intent matched.`);
-    }
+    // if (result.intent) {
+    //     console.log(`  Intent: ${result.intent.displayName}`);
+    // } else {
+    //     console.log(`  No intent matched.`);
+    // }
 
     return result.fulfillmentText;
 }
